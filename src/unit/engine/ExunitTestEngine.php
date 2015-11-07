@@ -20,7 +20,7 @@ final class ExunitTestEngine extends ArcanistUnitTestEngine {
     $this->projectRoot = $working_copy->getProjectRoot();
 
     // this is the standard report location when using mix test
-    $junit_file = $this->projectRoot . "/_build/test/test-junit-report.xml";
+    $junit_file = $this->projectRoot.'/_build/test/test-junit-report.xml';
     $cover_tmp = new TempFile();
 
     $future = $this->buildTestFuture($junit_file, $cover_tmp);

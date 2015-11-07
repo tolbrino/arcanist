@@ -26,13 +26,14 @@ final class ArcanistElixirDogmaLinter extends ArcanistExternalLinter {
     return 'mix';
   }
 
-  public function getMandatoryFlags() {
+  protected function getMandatoryFlags() {
     return array('dogma', '--noerrors', '--format=flycheck');
   }
 
   public function getInstallInstructions() {
     return pht(
-      'Install dogma by adding it as a dependency to your deps and executing mix deps.get');
+      'Install dogma by adding it as a dependency to your deps and
+      executing mix deps.get');
   }
 
   public function shouldExpectCommandErrors() {
