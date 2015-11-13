@@ -61,7 +61,7 @@ final class ArcanistElixirDogmaLinter extends ArcanistExternalLinter {
     if ($this->projectRootDir) {
       $flags[] = 'cmd';
       $flags[] = 'cd '.$this->projectRootDir;
-      $flags[] = "&&";
+      $flags[] = '&&';
       $flags[] = 'mix';
     }
     $flags[] = 'dogma --format=flycheck';
