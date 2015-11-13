@@ -2,6 +2,8 @@
 
 final class ArcanistElixirDogmaLinter extends ArcanistExternalLinter {
 
+  private $projectRootDir = null;
+
   public function getInfoName() {
     return 'ElixirDogma';
   }
@@ -21,13 +23,49 @@ final class ArcanistElixirDogmaLinter extends ArcanistExternalLinter {
   public function getLinterConfigurationName() {
     return 'elixirdogma';
   }
+  public function getLinterConfigurationOptions() {
+    $options = array(
+      'elixirdogma.project-root-dir' => array(
+        'type' => 'optional string',
+        'help' => pht(
+          'Adjust the project root directory in which mix is executed.'.
+          'This is useful in case the Elixir project\'s root'.
+          'resides in a subdirectory of the repository.'),
+      ),
+    );
+
+    return $options + parent::getLinterConfigurationOptions();
+  }
+
+  public function setProjectRootDir($new_dir) {
+    $this->projectRootDir = $new_dir;
+    return $this;
+  }
+
+  public function setLinterConfigurationValue($key, $value) {
+    switch ($key) {
+      case 'elixirdogma.project-root-dir':
+        $this->setProjectRootDir($value);
+        return;
+    }
+
+    return parent::setLinterConfigurationValue($key, $value);
+  }
 
   public function getDefaultBinary() {
     return 'mix';
   }
 
   protected function getMandatoryFlags() {
-    return array('dogma', '--noerrors', '--format=flycheck');
+    $flags = array();
+    if ($this->projectRootDir) {
+      $flags[] = 'cmd';
+      $flags[] = 'cd '.$this->projectRootDir;
+      $flags[] = "&&";
+      $flags[] = 'mix';
+    }
+    $flags[] = 'dogma --format=flycheck';
+    return $flags;
   }
 
   public function getInstallInstructions() {
@@ -37,7 +75,7 @@ final class ArcanistElixirDogmaLinter extends ArcanistExternalLinter {
   }
 
   public function shouldExpectCommandErrors() {
-    return false;
+    return true;
   }
 
   protected function canCustomizeLintSeverities() {
