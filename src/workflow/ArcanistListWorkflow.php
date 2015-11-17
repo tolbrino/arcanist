@@ -24,6 +24,18 @@ EOTEXT
       );
   }
 
+  public function getArguments() {
+    return array(
+      'as-reviewer' => array(
+        'help' => pht(
+          'List revision where you are assigned as reviewer'),
+      ));
+  }
+
+  private function shouldShowAsReviewer() {
+    return $this->getArgument('as-reviewer', false);
+  }
+
   public function requiresConduit() {
     return true;
   }
@@ -47,12 +59,15 @@ EOTEXT
       'Abandoned'       => 'default',
     );
 
+    $query_opts = array('status'  => 'status-open');
+    $phids = array($this->getUserPHID());
+    if ($this->shouldShowAsReviewer()) {
+        $query_opts = array_merge($query_opts, array('reviewers' => $phids));
+    } else {
+        $query_opts = array_merge($query_opts, array('authors' => $phids));
+    }
     $revisions = $this->getConduit()->callMethodSynchronous(
-      'differential.query',
-      array(
-        'authors' => array($this->getUserPHID()),
-        'status'  => 'status-open',
-      ));
+      'differential.query', $query_opts);
 
     if (!$revisions) {
       echo pht('You have no open Differential revisions.')."\n";
