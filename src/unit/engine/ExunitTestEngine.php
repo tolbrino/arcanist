@@ -67,8 +67,8 @@ final class ExunitTestEngine extends ArcanistUnitTestEngine {
   }
 
   private function buildTestFuture($project, $paths, $junit_file) {
-    $cmd_line = csprintf('cd %s && mix test %s --junit',
-      $project, implode(' ', $paths));
+    $cmd_line = csprintf('cd %s && mix test %Ls --junit',
+      $project, $paths);
 
     return new ExecFuture('%C', $cmd_line);
   }
@@ -88,15 +88,19 @@ final class ExunitTestEngine extends ArcanistUnitTestEngine {
   private function findProjects($paths) {
     $projects = array();
     foreach ($paths as $path) {
+      // FIXME: temporary workaround to handle weird file caching issue
+      if (!file_exists($path)) {
+        continue;
+      }
       $path = realpath($path);
       $orig_path = $path;
       do {
+        $path = dirname($path);
         foreach (glob($path.'/mix.exs') as $project_file) {
           $project = dirname($project_file);
           $projects_new = array($project => array($orig_path));
           $projects = array_merge_recursive($projects, $projects_new);
         }
-        $path = dirname($path);
       } while ($this->projectRoot != $path);
     }
     return $projects;
