@@ -64,7 +64,8 @@ final class ArcanistElixirDogmaLinter extends ArcanistExternalLinter {
       $flags[] = '&&';
       $flags[] = 'mix';
     }
-    $flags[] = 'dogma --format=flycheck';
+    $flags[] = 'dogma';
+    $flags[] = '--format=flycheck';
     return $flags;
   }
 
